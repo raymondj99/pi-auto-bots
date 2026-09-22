@@ -5,7 +5,10 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { buildCoordinationBootstrap } from "../src/coordination/bootstrap.ts";
 import { CoordinationBroker, hasLiveCoordinationRuns } from "../src/coordination/broker.ts";
-import { parseCoordinationConfig } from "../src/coordination/config.ts";
+import {
+	loadOptionalCoordinationConfig,
+	parseCoordinationConfig,
+} from "../src/coordination/config.ts";
 import { CoordinationEventLog } from "../src/coordination/event-log.ts";
 import {
 	computeCharacterizationMetrics,
@@ -94,6 +97,26 @@ describe("coordination characterization and config", () => {
 		assert.equal(current.channelRecreationsNeededForMembership, 0);
 		assert.equal(fixture.expectedOutcomes.membershipChangeRequiresRecreate, false);
 	});
+	it("applies the workflow-mode environment override with no config file present", () => {
+		// config.json is gitignored, so it is absent in CI and in a fresh clone. The
+		// override used to apply only on the file-reading path, which silently left a
+		// run in fast mode when it asked for strict.
+		const previous = process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE;
+		const missing = join(mkdtempSync(join(tmpdir(), "coord-config-")), "absent.json");
+		try {
+			process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE = "strict";
+			const config = loadOptionalCoordinationConfig(missing);
+			assert.equal(config.workflowMode, "strict");
+			assert.ok(config.protectedOperations.includes("shell"), "strict protects shell");
+
+			delete process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE;
+			assert.equal(loadOptionalCoordinationConfig(missing).workflowMode, "fast");
+		} finally {
+			if (previous === undefined) delete process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE;
+			else process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE = previous;
+		}
+	});
+
 	it("parses the coordination schema strictly and rejects unknown settings", () => {
 		const parsed = parseCoordinationConfig({
 			coordination: {

@@ -28,11 +28,7 @@ import { buildCoordinationBootstrap } from "./coordination/bootstrap.ts";
 import { CoordinationBroker, hasLiveCoordinationRuns } from "./coordination/broker.ts";
 import { coordinationChatMembers, coordinationChatRecords } from "./coordination/chat.ts";
 import { formatRunTaskOutcome } from "./coordination/completion.ts";
-import {
-	type CoordinationConfig,
-	defaultCoordinationConfig,
-	loadCoordinationConfig,
-} from "./coordination/config.ts";
+import { type CoordinationConfig, loadOptionalCoordinationConfig } from "./coordination/config.ts";
 import { installProtectedExecution } from "./coordination/execution.ts";
 import { normalizeCoordinationRoleId } from "./coordination/identity.ts";
 import { installCoordinationInbox } from "./coordination/inbox.ts";
@@ -552,8 +548,7 @@ function getArtifactDir(sessionDir: string, sessionId: string): string {
 
 const statusConfig = loadStatusConfig();
 function loadPackageCoordinationConfig(): CoordinationConfig {
-	const configPath = join(SRC_DIR, "../config.json");
-	return existsSync(configPath) ? loadCoordinationConfig(configPath) : defaultCoordinationConfig();
+	return loadOptionalCoordinationConfig(join(SRC_DIR, "../config.json"));
 }
 
 function formatWidgetRightLabel(snapshot: StatusSnapshot): string {

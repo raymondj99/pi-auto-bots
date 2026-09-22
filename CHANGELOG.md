@@ -76,6 +76,12 @@ older prose-coordination protocol it was built beside has been removed.
   `/final assistant summary is delivered automatically/`; the prompt had been rewritten and
   the assertion never updated, so the suite shipped one permanent failure. It now asserts the
   wording the bootstrap actually emits.
+- **`PI_SUBAGENT_COORDINATION_WORKFLOW_MODE` was silently inert without a `config.json`.**
+  The override was applied only on the file-reading path, but `config.json` is gitignored,
+  so it is absent in CI and in a fresh clone. A run asking for strict mode quietly stayed in
+  fast mode with shell unprotected. `loadOptionalCoordinationConfig()` now applies
+  environment overrides on both paths. Pre-existing; local development masked it because a
+  `config.json` was always present.
 - **The shipped `config.json` declared `protocolVersion`,** which the parser rejects as an
   unknown key once the setting was removed, breaking every child bootstrap.
 

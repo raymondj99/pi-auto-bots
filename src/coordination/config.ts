@@ -136,14 +136,35 @@ export function parseCoordinationConfig(raw: unknown): CoordinationConfig {
 	return config;
 }
 
-export function loadCoordinationConfig(path: string): CoordinationConfig {
-	const raw = JSON.parse(readFileSync(path, "utf8"));
+/**
+ * Apply runtime environment overrides to raw config input.
+ *
+ * This must run whether or not `config.json` exists. The file is gitignored, so it is
+ * absent in CI and in a fresh clone; applying the override only on the file path made
+ * `PI_SUBAGENT_COORDINATION_WORKFLOW_MODE` silently inert there, leaving a run in fast
+ * mode that asked for strict.
+ */
+function withEnvironmentOverrides(raw: unknown): unknown {
 	const mode = process.env.PI_SUBAGENT_COORDINATION_WORKFLOW_MODE;
-	if (mode) raw.coordination = { ...raw.coordination, workflowMode: mode };
-	return parseCoordinationConfig(raw);
+	if (!mode) return raw;
+	const root = (raw ?? {}) as Record<string, unknown>;
+	const coordination = (root.coordination ?? {}) as Record<string, unknown>;
+	return { ...root, coordination: { ...coordination, workflowMode: mode } };
+}
+
+export function loadCoordinationConfig(path: string): CoordinationConfig {
+	return parseCoordinationConfig(withEnvironmentOverrides(JSON.parse(readFileSync(path, "utf8"))));
+}
+
+/** Config for a path that may not exist; environment overrides still apply. */
+export function loadOptionalCoordinationConfig(path: string): CoordinationConfig {
+	return existsSync(path)
+		? loadCoordinationConfig(path)
+		: parseCoordinationConfig(withEnvironmentOverrides({}));
 }
 
 export function loadLocalCoordinationConfig(): CoordinationConfig {
-	const path = fileURLToPath(new URL("../../config.json", import.meta.url));
-	return existsSync(path) ? loadCoordinationConfig(path) : parseCoordinationConfig({});
+	return loadOptionalCoordinationConfig(
+		fileURLToPath(new URL("../../config.json", import.meta.url)),
+	);
 }
