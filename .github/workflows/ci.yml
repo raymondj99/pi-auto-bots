@@ -33,7 +33,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # The integration suites spawn the pi binary; they do not import its types, so the
+      # runtime CLI is independent of the source's compile baseline. The @mariozechner
+      # line is deprecated and stops at 0.73.1, which predates flags these tests use.
       - name: Install pi
-        run: npm install -g @mariozechner/pi-coding-agent@latest
+        run: npm install -g @earendil-works/pi-coding-agent@latest
+      - name: Report pi version
+        run: pi --version
       - name: Integration suites
         run: npm run test:integration
