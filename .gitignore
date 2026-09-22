@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Local, per-checkout configuration
+config.json
+
+# Local pi state, excluding checked-in skills and settings
+.pi/*
+!.pi/skills/
+!.pi/settings.json
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

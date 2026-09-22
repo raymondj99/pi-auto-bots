@@ -1,0 +1,58 @@
+{
+  "name": "pi-auto-bots",
+  "version": "0.1.0",
+  "description": "A pi extension for coordinated auto-bots: spawn and orchestrate sub-agent sessions in cmux/tmux/zellij/wezterm panes on top of an event-sourced control plane with typed tasks, channels, signals, artifacts and permits, plus a local browser chat dashboard.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "subagent",
+    "agent",
+    "auto-bots",
+    "coordination",
+    "orchestration"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raymondj99/pi-auto-bots.git"
+  },
+  "homepage": "https://github.com/raymondj99/pi-auto-bots#readme",
+  "bugs": {
+    "url": "https://github.com/raymondj99/pi-auto-bots/issues"
+  },
+  "scripts": {
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "lint": "biome check src/ test/",
+    "lint:fix": "biome check --fix src/ test/",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.ts",
+    "test:integration": "node --test --test-concurrency=1 test/integration/coordination-runtime.test.ts test/integration/coordination-extension-runtime.test.ts test/integration/coordination-chat-browser.test.ts test/integration/coordination-worked-example.test.ts test/integration/coordination-child-example.test.ts test/integration/coordination-autonomy.test.ts test/integration/coordination-peers.test.ts",
+    "bench": "node test/bench/coordination.ts",
+    "test:coordination-example": "node --test --test-concurrency=1 test/integration/coordination-worked-example.test.ts test/integration/coordination-child-example.test.ts test/integration/coordination-autonomy.test.ts test/integration/coordination-peers.test.ts"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "@sinclair/typebox": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "skills": [
+      "./skills/coordination"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.14",
+    "@mariozechner/pi-ai": "^0.65.0",
+    "@mariozechner/pi-coding-agent": "^0.65.0",
+    "@mariozechner/pi-tui": "^0.65.0",
+    "@sinclair/typebox": "^0.34.49",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status": {
+    "enabled": true
+  },
+  "coordination": {
+    "workflowMode": "fast",
+    "maxEvents": 1000,
+    "maxDigestLines": 20,
+    "maxPayloadBytes": 131072,
+    "acknowledgementDeadlineMs": 300000,
+    "permitTtlMs": 300000,
+    "protectedOperations": ["costly_call", "deploy"],
+    "defaultDelivery": "digest",
+    "roleCapabilities": {}
+  }
+}

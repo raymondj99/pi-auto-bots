@@ -1,0 +1,24 @@
+# Development and CI configuration
+tsconfig.json
+biome.json
+.github/
+.vscode/
+.idea/
+.pi/
+
+# Contributor instructions, not for distribution
+AGENTS.md
+CLAUDE.md
+CONTRIBUTING.md
+
+# Tests and benchmarks
+test/
+
+# Long-form guides; README.md ships
+docs/
+
+# Local state and build artifacts
+config.json
+*.log
+*.tsbuildinfo
+.DS_Store

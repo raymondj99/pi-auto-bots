@@ -1,0 +1,49 @@
+{
+  "schema": "pi.coordination.characterization.reviewed-session",
+  "version": 1,
+  "description": "Anonymized deterministic replay of the reviewed prose-coordination failures used to gate the typed control plane.",
+  "roles": [
+    { "roleId": "coordinator", "runId": "run-coord-1", "generation": 1, "capabilities": ["coordinate", "approve", "freeze", "budget"] },
+    { "roleId": "builder", "runId": "run-builder-1", "generation": 1 },
+    { "roleId": "reviewer", "runId": "run-reviewer-1", "generation": 1 },
+    { "roleId": "inference", "runId": "run-inference-1", "generation": 1 },
+    { "roleId": "inference", "runId": "run-inference-2", "generation": 2, "replaces": "run-inference-1" }
+  ],
+  "events": [
+    { "t": 1, "kind": "v1.message", "from": "builder", "to": "reviewer", "text": "[#review] FINDING started review before assignment exists" },
+    { "t": 2, "kind": "v1.protected_dispatch", "from": "inference", "operation": "costly_call", "inputArtifact": "registry/latest.json", "valid": false, "reason": "pre-assignment, no frozen input, no budget lease" },
+    { "t": 3, "kind": "v1.task_assign", "taskId": "task-pack", "to": "builder", "title": "Build aggregate registry" },
+    { "t": 4, "kind": "v1.artifact_publish", "artifactId": "pack", "path": "registry/latest.json", "digest": "sha256:aaa", "frozen": false },
+    { "t": 5, "kind": "v1.message", "from": "coordinator", "to": "inference", "text": "GO use registry/latest.json" },
+    { "t": 6, "kind": "v1.protected_dispatch", "from": "inference", "operation": "costly_call", "inputArtifact": "registry/latest.json", "valid": false, "reason": "GO was prose, artifact unfrozen" },
+    { "t": 7, "kind": "v1.artifact_publish", "artifactId": "pack", "path": "registry/latest.json", "digest": "sha256:bbb", "supersedes": "sha256:aaa", "frozen": true },
+    { "t": 8, "kind": "v1.message", "from": "builder", "to": "reviewer", "text": "[#review] CORRECTION aggregate rebuilt to 24 calls" },
+    { "t": 9, "kind": "v1.protected_dispatch", "from": "inference", "operation": "costly_call", "inputArtifact": "sha256:aaa", "valid": false, "reason": "stale artifact consumed after supersession" },
+    { "t": 10, "kind": "v1.channel_create", "channelId": "review-v1", "members": ["builder", "old-reviewer"] },
+    { "t": 11, "kind": "v1.message", "from": "coordinator", "to": "builder", "text": "Use direct messages; channel membership is stale" },
+    { "t": 12, "kind": "v1.delivery_uncertain", "eventId": "msg-critical-hold", "state": "queued" },
+    { "t": 13, "kind": "v1.budget_reserve", "budgetId": "gpu-calls", "amount": 1, "state": "dispatched" },
+    { "t": 14, "kind": "v1.disconnect", "roleId": "inference", "runId": "run-inference-1", "outcome": "unknown" },
+    { "t": 15, "kind": "v1.replacement", "roleId": "inference", "newRunId": "run-inference-2" },
+    { "t": 16, "kind": "v1.budget_reserve", "budgetId": "gpu-calls", "amount": 1, "state": "reused_after_unknown", "valid": false, "reason": "unknown dispatched reservation must remain charged" },
+    { "t": 17, "kind": "v1.message", "from": "reviewer", "to": "coordinator", "text": "BLOCKER dependency on frozen pack and explicit ack", "signal": { "kind": "blocked", "severity": "blocking", "requiresAck": ["inference"] } },
+    { "t": 18, "kind": "v1.protected_dispatch", "from": "inference", "operation": "costly_call", "inputArtifact": "sha256:bbb", "valid": false, "reason": "unresolved blocker and required acknowledgement" }
+  ],
+  "expectedV1Metrics": {
+    "parentRelays": 2,
+    "fakeChannelPrefixes": 2,
+    "supersededFacts": 2,
+    "invalidProtectedDispatches": 4,
+    "wakeCount": 6,
+    "budgetUnknownReuses": 1,
+    "channelRecreationsNeededForMembership": 1
+  },
+  "expectedOutcomes": {
+    "invalidProtectedDispatches": 0,
+    "fakeChannelPrefixes": 0,
+    "staleArtifactConsumptions": 0,
+    "unknownReservationAutoMigrations": 0,
+    "criticalWakePerRevisionMax": 1,
+    "membershipChangeRequiresRecreate": false
+  }
+}

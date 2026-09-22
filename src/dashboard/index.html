@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Chats</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <aside class="inbox-pane" aria-label="Chats">
+      <header class="brand"><h1>Chats</h1><span id="session-name">Current session</span></header>
+      <label class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input id="search" type="search" aria-label="Search chats and messages" placeholder="Search" autocomplete="off"><kbd>/</kbd>
+      </label>
+      <div class="inbox-scroll">
+        <section aria-labelledby="agents-heading">
+          <h2 class="pane-label" id="agents-heading">Agents</h2>
+          <nav id="agent-list" class="agent-list" aria-label="Agent timelines"></nav>
+        </section>
+        <section id="channels-section" aria-labelledby="inbox-heading" hidden>
+          <h2 class="pane-label" id="inbox-heading">Channels <span id="conversation-count" class="sr-only"></span></h2>
+          <nav id="thread-list" class="thread-list" aria-label="Coordinator channels"></nav>
+        </section>
+        <div id="empty-inbox" class="empty" hidden>No chats yet.</div>
+      </div>
+      <div class="history-controls"><label><input id="show-archived" type="checkbox"> Show archived</label></div>
+    </aside>
+
+    <main id="conversation-pane" class="conversation-pane" aria-labelledby="conversation-title">
+      <header class="conversation-header">
+        <button id="back" class="back-button" type="button" aria-label="Back to chats">←</button>
+        <div class="conversation-heading">
+          <div class="title-line"><h2 id="conversation-title">Chats</h2><span id="connection-dot" class="connection-dot" aria-hidden="true"></span><span id="connection-label" class="connection-label">Connecting</span></div>
+          <div id="conversation-subtitle" class="subtle"></div>
+        </div>
+        <details id="chat-options" class="chat-options">
+          <summary aria-label="Chat options" title="Chat options">···</summary>
+          <div class="options-panel">
+            <button id="details" class="quiet-button" type="button" aria-pressed="false">Show details</button>
+            <button id="archive-selected" class="quiet-button" type="button" hidden>Archive chat</button>
+            <button id="clear-chats" class="quiet-button" type="button">Archive all chats</button>
+            <details id="operations-panel" hidden>
+              <summary>Coordination details</summary>
+              <section id="operational-summary" class="operational-summary" aria-label="Coordination operational state" hidden></section>
+            </details>
+          </div>
+        </details>
+      </header>
+      <div class="notices">
+        <div id="connection-banner" class="connection-banner" role="status" aria-live="polite"></div>
+        <div id="mutation-status" role="status" aria-live="polite"></div>
+      </div>
+      <section id="transcript" class="transcript" aria-label="Timeline messages" tabindex="0">
+        <button id="load-older" class="load-older" type="button" hidden>Load older</button>
+        <div id="messages" class="messages"></div>
+        <div id="empty-conversation" class="empty conversation-empty">Choose a chat to get started.</div>
+      </section>
+      <button id="jump-latest" class="jump-latest" type="button" hidden>Latest ↓</button>
+      <footer class="privacy-footer">Read-only · Local history</footer>
+    </main>
+  </div>
+  <noscript>This dashboard requires JavaScript.</noscript>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
